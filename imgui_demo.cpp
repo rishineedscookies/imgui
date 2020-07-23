@@ -218,6 +218,148 @@ static void ShowDemoWindowPopups();
 static void ShowDemoWindowColumns();
 static void ShowDemoWindowMisc();
 
+static void TestLogarithmicDragSliders()
+{
+    // Tests for logarithmic sliders
+    ImGui::Begin("Slider tests");
+
+    static float v = 0.0f;
+    ImGui::DragFloat("Drag RoundToFormat=1", &v, 0.001f, .00001f, 1.0f, "%.3f", ImGuiDragFlags_Logarithmic);
+    ImGui::DragFloat("Drag RoundToFormat=0", &v, 0.001f, .00001f, 1.0f, "%.3f", ImGuiDragFlags_Logarithmic | ImGuiDragFlags_NoRoundToFormat);
+    ImGui::SliderFloat("Slider RoundToFormat=1", &v, .00001f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("Slider RoundToFormat=0", &v, .00001f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoRoundToFormat);
+
+    for (int pass = 0; pass < 2; pass++)
+    {
+        ImGui::PushID(pass);
+
+        ImGuiSliderFlags slider_flags = (pass == 1) ? ImGuiSliderFlags_Logarithmic : ImGuiSliderFlags_None;
+        ImGuiDragFlags drag_flags = (pass == 1) ? ImGuiDragFlags_Logarithmic : ImGuiDragFlags_None;
+
+        ImGui::Columns(2);
+        ImGui::Text((pass == 0) ? "Normal Slider" : "Log Slider");
+        ImGui::NextColumn();
+        ImGui::Text((pass == 0) ? "Normal Drag" : "Log Drag");
+        ImGui::NextColumn();
+
+
+        {
+            // FIXME: With io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard, we cannot step out of small Logarithmic Slider values.
+            // Maybe Slider could accumulate changes until they take effect (with rounding) and then subtract from the accumulator? (this is what Drag already does)
+
+            static float val = 0.001f;
+            ImGui::SliderFloat("Normal", &val, 0.001f, 100.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Normal drag", &val, 1.0f, 0.001f, 100.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Normal from zero", &val, 0.0f, 100.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Normal from zero drag", &val, 1.0f, 0.0f, 100.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Negative from zero", &val, -100.0f, 0.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Negative from zero drag", &val, 1.0f, -100.0f, 0.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Negative to positive", &val, -100.0f, 100.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Negative to positive drag", &val, 1.0f, -100.0f, 100.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Negative to positive offset", &val, -10.0f, 100.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Negative to positive offset drag", &val, 1.0f, -10.0f, 100.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Normal from zero reverse", &val, 100.0f, 0.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            // FIXME: Negative drag doesn't work. Should at least remove `bool is_locked` in DragBehaviorT() but that's not enough.
+            ImGui::DragFloat("Normal from zero reverse drag", &val, 1.0f, 100.0f, 0.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Negative to positive reverse", &val, 100.0f, -100.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            // FIXME: Negative drag doesn't work. Should at least remove `bool is_locked` in DragBehaviorT() but that's not enough.
+            ImGui::DragFloat("Negative to positive reverse drag", &val, 1.0f, 100.0f, -100.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0f;
+            ImGui::SliderFloat("Huge from zero", &val, 0.0f, 1000000.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Huge from zero drag", &val, 10000.0f, 0.0f, 1000000.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            // FIXME: Doesn't work with e.g. FLT_MAX/1000.0f. Maybe that's fine but would be nice to clearly define (assert?) on known limits with Logarithmic flag.
+            static float val = 0.0f;
+            ImGui::SliderFloat("Huge negative to positive", &val, -1000000.0f, 1000000.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Huge negative to positive drag", &val, 10000.0f, -1000000.0f, 1000000.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0001f;
+            ImGui::SliderFloat("Tiny", &val, 0.0001f, 0.0004f, "%.8f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Tiny drag", &val, 0.00001f, 0.0001f, 0.0004f, "%.8f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 0.0001f;
+            ImGui::SliderFloat("Tiny 2", &val, 0.0001f, 0.01f, "%.8f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Tiny 2 drag", &val, 0.00001f, 0.0001f, 0.01f, "%.8f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 10000.0f;
+            ImGui::SliderFloat("Offset", &val, 10000.0f, 10001.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Offset drag", &val, 0.001f, 10000.0f, 10001.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        {
+            static float val = 10000.0f;
+            ImGui::SliderFloat("Offset 2", &val, 10000.0f, 20000.0f, "%.3f", slider_flags);
+            ImGui::NextColumn();
+            ImGui::DragFloat("Offset 2 drag", &val, 100.0f, 10000.0f, 20000.0f, "%.3f", drag_flags);
+            ImGui::NextColumn();
+        }
+
+        ImGui::Columns(1);
+        ImGui::PopID();
+    }
+
+    ImGui::End();
+}
+
 // Demonstrate most Dear ImGui features (this is big function!)
 // You may execute this function to experiment with the UI and understand what it does.
 // You may then search for keywords in the code when you are interested by a specific feature.
@@ -226,6 +368,8 @@ void ImGui::ShowDemoWindow(bool* p_open)
     // Exceptionally add an extra assert here for people confused about initial Dear ImGui setup
     // Most ImGui functions would normally just crash if the context is missing.
     IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
+
+    TestLogarithmicDragSliders();
 
     // Examples Apps (accessible from the "Examples" menu)
     static bool show_app_main_menu_bar = false;
