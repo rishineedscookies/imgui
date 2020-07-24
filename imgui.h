@@ -1282,7 +1282,8 @@ enum ImGuiDragFlags_
     ImGuiDragFlags_InvalidMask_             = 0x7000000F,   // [Internal] We treat using those bits as being potentially a 'float power' argument from the previous API that has got miscast to this enum, and will trigger an assert if needed.
     ImGuiDragFlags_ClampOnInput             = 1 << 4,       // Clamp value to min/max bounds (if any) when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
     ImGuiDragFlags_Logarithmic              = 1 << 5,       // Make the widget logarithmic (linear otherwise)
-    ImGuiDragFlags_NoRoundToFormat          = 1 << 6        // Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+    ImGuiDragFlags_NoRoundToFormat          = 1 << 6,       // Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+    ImGuiDragFlags_NoInput                  = 1 << 7        // Disable CTRL+Click or Enter key allowing to input text directly into the widget
 };
 
 // Flags for SliderFloat(), SliderInt() etc.
@@ -1292,7 +1293,8 @@ enum ImGuiSliderFlags_
     ImGuiSliderFlags_InvalidMask_           = 0x7000000F,   // [Internal] We treat using those bits as being potentially a 'float power' argument from the previous API that has got miscast to this enum, and will trigger an assert if needed.
     ImGuiSliderFlags_ClampOnInput           = 1 << 4,       // Clamp value to min/max bounds when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
     ImGuiSliderFlags_Logarithmic            = 1 << 5,       // Make the widget logarithmic (linear otherwise)
-    ImGuiSliderFlags_NoRoundToFormat        = 1 << 6        // Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+    ImGuiSliderFlags_NoRoundToFormat        = 1 << 6,       // Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
+    ImGuiSliderFlags_NoInput                = 1 << 7        // Disable CTRL+Click or Enter key allowing to input text directly into the widget
 };
 
 // Identify a mouse button.
